@@ -1,35 +1,45 @@
-//a  = users
-const fetch = a => a()
-//variable holding function and passed as paraemeter
-let users = () => console.log('users function')
-fetch(users) //passing values via variables
-fetch(() => console.log('users anonymous'))
-////////////////////////////////////////////////////////////////////////////////////
 
-const getValue = (cb) => {
-    let result = cb(10, 10)
-    console.log(`Result is ${result}`)
-}
-getValue((value1, value2) => {
-    console.log(`Values are ${value1} ${value2}`)
-    return value1 * value2
-})
-const logi = (userName, password, success, failure) => {
-    if (userName === 'admin' && password === 'admin') {
-        success('login success')
+
+const getUser = (resolve, reject) => {
+    console.log('getUser is called')
+    //mock data
+    let user = { name: 'admin' }
+    //user = null
+    if (user) {
+        setTimeout(resolve, 1000, user)
     } else {
-        failure('login failed')
+        setTimeout(reject, 1000, 'User not found')
     }
 }
-login('admin', 'admin', status => console.log(status), err => console.log(err))
+
+const login = (user, resolve, reject) => {
+    console.log('login is called')
+    if (user.name === 'admin') {
+        setTimeout(resolve, 1000, 'login success')
+    } else {
+        setTimeout(reject, 1000, 'login failed')
+    }
+}
+
+const showDashboard = (status, resolve, reject) => {
+    console.log('Dashboard is called')
+    if (status === 'login success') {
+        setTimeout(resolve, 1000, 'Welcome to Dashboard')
+    } else {
+        setTimeout(reject, 1000, 'Sorry retry!')
+    }
+}
 
 
-
-
-
-
-
-
-
-
-
+function main() {
+    getUser(user => {
+        login(user, status => {
+            showDashboard(status, message => console.log(message), err => console.log(err))
+        }, err => {
+            console.log(err)
+        })
+    }, err => {
+        console.log(err)
+    })
+}
+main()
