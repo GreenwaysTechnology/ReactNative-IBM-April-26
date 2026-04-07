@@ -336,3 +336,224 @@ const Heading = <h1>Hello React! How are you?</h1>
 
 // ReactDOM.createRoot(document.getElementById('root')).render(Heading)
 createRoot(document.getElementById('root')).render(Heading)
+
+.........................................................................................................................................................................................................................................
+				                                     Component
+..........................................................................................................................................................................................................................................
+
+What is Component ?
+  Component is Object , Coined by MS in 1989.
+
+According to ms, Component is object which has state(data),behavior(methods) + User interface(Visual).
+ eg:Button,TextBox,Grid,Menu,MenuBar,Layout,Table.....
+
+Component === Widget ==== Object ==== DOM
+
+Like Object tree(DOM Tree), In React we can create "Component" Tree.
+
+
+      Node===DOM Object====Component
+       h1   --->  HTML Heading--->   Heading
+
+"React apps are made out of components. A Component is piece of the UI that has its own logic and appearance, A Component can be small as a button or as large as an entire Page"
+
+.....................................................................................
+
+In coding 
+
+There two libs 
+1.react.js  => to create component and manages all features related component.
+2.react-dom => Render engine /react engine
+
+react.js
+
+1.React
+  It top level class which provides all apis to create,delete,update components.
+
+react-dom.js
+
+2.ReactDOM
+
+   It is top level class which provides api to flush the v.dom into real dom.
+
+........................................................................................................................................................................................................................................
+									Component Creational patterns
+.........................................................................................................................................................................................................................................
+
+
+1.variable pattern
+2.functional pattern
+3.es 6 class pattern
+
+     					Components can be created any one or mixed way  style.
+   					"functional Pattern" is more popular and recommended pattern....
+
+1.variable pattern
+import { createRoot } from "react-dom/client"
+
+//variable pattern 
+//Here Heading is just variable , referencing the Component
+//<h1>xxx</h1> -  Component
+const Heading = <h1>Hello React! How are you?</h1>
+
+createRoot(document.getElementById('root')).render(Heading)
+
+
+2.functional pattern
+
+ 2.1.normal function - es 5 function
+ 2.1.arrow function -  es 6 function 
+
+es 5 function:
+import { createRoot } from "react-dom/client"
+
+//functions 
+function Heading() {
+    return <h1>Hello, React!</h1>
+}
+
+createRoot(document.getElementById('root')).render(Heading())
+
+render(Heading()) -  here we invoke function which is not recommended 
+
+render(<Heading></Heading>) - here we use like html tag 
+render(<Heading/>) - here we use like html tag -self closing
+
+import { createRoot } from "react-dom/client"
+
+//functions 
+function Heading() {
+    return <h1>Hello, React!</h1>
+}
+
+// createRoot(document.getElementById('root')).render(Heading())
+// createRoot(document.getElementById('root')).render(<Heading></Heading>)
+
+createRoot(document.getElementById('root')).render(<Heading/>)
+
+
+2.1.arrow function -  es 6 function 
+import { createRoot } from "react-dom/client"
+
+//arrow
+// const Heading = () => {
+//     return <h1>Hello, React!</h1>
+// }
+const Heading = () => <h1>Hello, React!</h1>
+
+createRoot(document.getElementById('root')).render(<Heading />)
+.....................................................................................
+			 ES6 Classes
+.....................................................................................
+The latest react echo system, does not recommend to go with class patterns.
+
+import React from "react"
+import { createRoot } from "react-dom/client"
+
+class Heading extends React.Component {
+
+    render() {
+        return <h1>Hello React!!</h1>
+    }
+}
+
+
+createRoot(document.getElementById('root')).render(<Heading />)
+....................................................................................
+							Exploring JSX
+.....................................................................................
+
+JS-JavaScript
+X -  XML
+
+	Since HTML parser is weak, but when y write react code, we need consistent code generation.
+
+So that react team, developed compiler follows basic xml rules.
+
+Basic XML  rules:
+
+1.every opened element must be closed
+  <h1>Hello</h1>
+  <Welcome></Welcome>
+ some elements may not have closing tag
+  <img /> : image element has no child elements : self closing. 
+
+import { createRoot } from "react-dom/client"
+
+const Heading = ()=>{
+    return <h1>Hello
+}
+
+
+createRoot(document.getElementById('root')).render(<Heading />)
+
+[plugin:vite:react-babel] G:\IBM\2024\Nov\ReactiveNative-B1\myreact-app\src\main.jsx: Unterminated JSX contents. (8:62)
+
+   6 |
+   7 |
+>  8 | createRoot(document.getElementById('root')).render(<Heading />)
+
+
+2. In xml you must have one single root element.
+  all elements must be organized under single root element.
+
+   <h1>Welcome to IBM</h1>
+   <p>Hello</p>
+
+In html what can be root element
+ <div>,<span>,all html 5 layout elements header,footer,section,aside...
+
+import { createRoot } from "react-dom/client"
+
+const Heading = ()=>{
+    return <h1>Hello</h1>
+           <p>This is element</p>
+}
+
+
+createRoot(document.getElementById('root')).render(<Heading />)
+
+Solution:
+import { createRoot } from "react-dom/client"
+
+const Heading = () => {
+    return <div><h1>Hello</h1>
+        <p>This is element</p>
+    </div>
+}
+
+
+createRoot(document.getElementById('root')).render(<Heading />)
+
+
+3.Self closing:
+import { createRoot } from "react-dom/client"
+import logo from './assets/react.svg';
+
+const Heading = () => {
+    return <div>
+        <img src={logo} />
+    </div>
+}
+
+
+createRoot(document.getElementById('root')).render(<Heading />)
+
+4.Component Name must be Pascal Case
+  It has to start with capital letter
+  It should be Noun
+
+import { createRoot } from "react-dom/client"
+import logo from './assets/react.svg';
+
+const heading = () => {
+    return <div>
+        <img src={logo} />
+    </div>
+}
+
+
+createRoot(document.getElementById('root')).render(<heading />)
+
+
+hook.js:608 Warning: The tag <heading> is unrecognized in this browser. If you meant to render a React component, start its name with an uppercase letter
