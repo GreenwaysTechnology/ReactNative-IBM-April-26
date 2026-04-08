@@ -838,3 +838,508 @@ createRoot(document.getElementById('root')).render(
         <App />
     </StrictMode>,
 )
+
+............................................................................................
+				List Render
+............................................................................................		
+How to render list/Array?
+
+npm create vite@latest list-app
+
+
+To iterate list in react/reactnative
+
+1.map
+2.filter
+3.find
+4.reduce
+
+based on arrays we can create many layouts
+
+1.listView - ul--li
+2.gridView - table tag
+3.cardView - div/section
+
+using map:
+
+App.jsx
+
+import { List } from "./list/List";
+
+function App() {
+
+  const subjects = ['React', 'ReactNative', 'Javascript', 'Mobile', 'Devops', 'Cloud']
+  return <>
+    <List subjects={subjects} />
+  </>
+}
+export default App;
+
+src/list/List.jsx
+
+const List = (props) => {
+    return <div>
+        <h1>List</h1>
+        <ul>
+            {
+                props.subjects.map(subject => {
+                    return <li>{subject}</li>
+                })
+            }
+        </ul>
+    </div>
+}
+export { List }
+.........................................................................................
+		      How to render list of objects
+...........................................................................................
+Using mock data
+
+import { ProductList } from "./list/List";
+import { PRODUCTS } from "./mock-data/products";
+
+function App() {
+
+    return <>
+        <ProductList products={PRODUCTS} />
+    </>
+}
+export default App;
+
+List.jsx
+
+const ProductList = ({ products }) => {
+    return <div>
+        {
+            products.map(product => {
+                return <div key={product.id}>
+                    <h2>{product.title}</h2>
+                    <img src={product.image} height={150} width={150} />
+                    <h5>Category: {product.category} Price : $ {product.price}</h5>
+                    <p>{product.description} </p>
+                    <h3>Rating : {product.rating.rate} Total {product.rating.count}</h3>
+                </div>
+            })
+        }
+    </div>
+}
+export { ProductList }
+...........................................................................................
+				Component Composition and List
+...........................................................................................
+
+List.jsx
+import { ListItem } from "./ListeItem"
+
+const ProductList = ({ products }) => <div>{
+    products.map(product => <ListItem product={product} />)
+}
+</div>
+
+export { ProductList }
+
+ListItem.jsx
+
+const ListItem = props => {
+    return <div key={props.product.id}>
+        <h2>{props.product.title}</h2>
+        <img src={props.product.image} height={150} width={150} />
+        <h5>Category: {props.product.category} Price : $ {props.product.price}</h5>
+        <p>{props.product.description} </p>
+        <h3>Rating : {props.product.rating.rate} Total {props.product.rating.count}</h3>
+    </div>
+}
+export { ListItem }
+
+App.jsx
+import { ProductList } from "./list/List";
+import { PRODUCTS } from "./mock-data/products";
+
+function App() {
+
+    return <>
+        <ProductList products={PRODUCTS} />
+    </>
+}
+export default App;
+
+Table View:
+import { createRoot } from 'react-dom/client'
+
+function TableView({ items }) {
+
+    return <table border="1" cellPadding="10">
+        <thead>
+            <tr>
+                <th>ID</th>
+                <th>Name</th>
+                <th>Age</th>
+            </tr>
+        </thead>
+        <tbody>
+            {items.map((user) => {
+                return <tr key={user.id}>
+                    <td>{user.id}</td>
+                    <td>{user.name}</td>
+                    <td>{user.age}</td>
+                </tr>
+            })}
+        </tbody>
+    </table>
+}
+
+function App() {
+    const items = [{
+        id: 1,
+        name: 'Subramanian Murugan',
+        age: 46
+    },
+    {
+        id: 2,
+        name: 'Karthik',
+        age: 36
+    }
+
+    ]
+    return <>
+        <TableView items={items} />
+    </>
+}
+
+createRoot(document.getElementById('root')).render(
+    <App />
+)
+
+.....................................................................................................................................................................................................................................
+											Styling
+...........................................................................................................................................................................................................................................
+
+web apps which are running inside browser, is based "CSS" styling language.
+
+There are two ways to apply CSS to react components
+
+1.external styles
+2.inline style
+
+external styles are applied via style sheet.
+
+app.css, index.css
+
+style selectors
+
+inside code
+
+import './App.css'
+
+<div className="background">
+
+</div>
+
+inline Style:
+  css styles are applied via JavaScript object style object
+
+<div style={StyleObject} </div>
+
+import { createRoot } from 'react-dom/client'
+
+const profiles = [
+    {
+        id: 1,
+        name: 'Raja',
+        role: "Front End Developer",
+        email: "raja@company.com",
+        avatar: "https://i.pravatar.cc/150?img=1"
+    },
+    {
+        id: 1,
+        name: 'Rahul',
+        role: "Back End Developer",
+        email: "rahul@company.com",
+        avatar: "https://i.pravatar.cc/150?img=2"
+
+    },
+    {
+        id: 3,
+        name: 'Divya',
+        role: "UI/UX Designer",
+        email: "divya@company.com",
+        avatar: "https://i.pravatar.cc/150?img=3"
+
+    },
+    {
+        id: 4,
+        name: 'Divya',
+        role: "UI/UX Designer",
+        email: "divya@company.com",
+        avatar: "https://i.pravatar.cc/150?img=10"
+
+    },
+    {
+        id: 5,
+        name: 'Divya',
+        role: "UI/UX Designer",
+        email: "divya@company.com",
+        avatar: "https://i.pravatar.cc/150?img=9"
+
+    },
+    {
+        id: 6,
+        name: 'Divya',
+        role: "UI/UX Designer",
+        email: "divya@company.com",
+        avatar: "https://i.pravatar.cc/150?img=8"
+
+    },
+    {
+        id: 7,
+        name: 'Divya',
+        role: "UI/UX Designer",
+        email: "divya@company.com",
+        avatar: "https://i.pravatar.cc/150?img=7"
+
+    },
+    {
+        id: 8,
+        name: 'Divya',
+        role: "UI/UX Designer",
+        email: "divya@company.com",
+        avatar: "https://i.pravatar.cc/150?img=6"
+
+    },
+    {
+        id: 9,
+        name: 'Divya',
+        role: "UI/UX Designer",
+        email: "divya@company.com",
+        avatar: "https://i.pravatar.cc/150?img=5"
+
+    },
+    {
+        id: 10,
+        name: 'Divya',
+        role: "UI/UX Designer",
+        email: "divya@company.com",
+        avatar: "https://i.pravatar.cc/150?img=4"
+
+    },
+    {
+        id: 11,
+        name: 'Divya',
+        role: "UI/UX Designer",
+        email: "divya@company.com",
+        avatar: "https://i.pravatar.cc/150?img=11"
+
+    }
+]
+
+
+function App() {
+    return <div style={styles.page}>
+        <header style={styles.header}>
+            <h2>Dashboard</h2>
+        </header>
+        <div styles={styles.main}>
+            <aside style={styles.sidebar}>
+                Side Bar
+            </aside>
+            <section style={styles.content}>
+                <h3>Team Members</h3>
+                <div style={styles.cards}>
+                    {
+                        profiles.map(profile => {
+                            return <section key={profile.id} style={styles.card}>
+                                <img
+                                    src={profile.avatar}
+                                    alt={profile.name}
+                                    style={styles.avatar}
+                                />
+                                <div style={styles.name}>{profile.name}</div>
+                                <div style={styles.role}>{profile.role}</div>
+                                <div style={styles.email}>{profile.email}</div>
+
+                            </section>
+                        })
+                    }
+
+                </div>
+            </section>
+            <footer style={styles.footer}>
+                @2026 Company
+            </footer>
+        </div>
+    </div>
+}
+
+createRoot(document.getElementById('root')).render(
+    <App />
+)
+const styles = {
+    page: {
+        display: "flex",
+        flexDirection: "column",
+        minHeight: "100vh",
+        fontFamily: "sans-serif",
+        backgroundColor: "#fafafa"
+    },
+    header: {
+        padding: 20,
+        backgroundColor: "#222",
+        color: "#fff",
+        textAlign: "center"
+    },
+    main: {
+        display: "flex",
+        flex: 1,
+    },
+    sidebar: {
+        width: 200,
+        backgroundColor: "#f4f4f4",
+        padding: 20
+    },
+    content: {
+        flex: 1,
+        padding: 20,
+        minWidth: 0,
+        backgroundColor: "#c8ffff"
+
+    },
+    cards: {
+        display: "flex",
+        gap: 10,
+        flexWrap: "wrap"
+    },
+    card: {
+        width: 220,
+        backgroundColor: "#fff",
+        borderRadius: 8,
+        padding: 15,
+        boxShadow: "0 2px 8px rgba(202, 14, 14, 0.1)",
+        textAlign: "center"
+    },
+    avatar: {
+        width: 80,
+        height: 80,
+        borderRadius: "50%",
+        objectFit: "cover",
+        marginBottom: 10
+    },
+    name: {
+        fontSize: 18,
+        fontWeight: "bold",
+
+    },
+    role: {
+        fontSize: 14,
+        color: "#777",
+        marginBottom: 8
+
+    },
+    email: {
+        fontSize: 13,
+        color: "#555"
+
+    },
+
+    footer: {
+        padding: 15,
+        backgroundColor: "#222",
+        color: "#fff",
+        textAlign: "center"
+    }
+}
+
+
+You can write your own css styles, but mostly not recommended, because we have to use css frameworks 
+
+1.bootstrap
+2.tailwindcss
+
+How to integrate tailwind css framework:
+
+Steps:
+01.
+Create your project
+Start by creating a new Vite project if you don’t have one set up already. The most common approach is to use Create Vite.
+
+npm create vite@latest styling-app
+cd  styling-app
+
+
+02
+Install Tailwind CSS
+Install tailwindcss and @tailwindcss/vite via npm.
+
+npm install tailwindcss @tailwindcss/vite
+
+
+03
+Configure the Vite plugin
+Add the @tailwindcss/vite plugin to your Vite configuration.
+
+
+vite.config.js
+import { defineConfig } from 'vite'
+import tailwindcss from '@tailwindcss/vite'
+
+export default defineConfig({
+  plugins: [
+    tailwindcss(),
+  ],
+})
+with React:
+import { defineConfig } from 'vite'
+import react from '@vitejs/plugin-react'
+import tailwindcss from '@tailwindcss/vite'
+
+// https://vite.dev/config/
+export default defineConfig({
+  plugins: [react(),tailwindcss()],
+})
+
+
+04
+Import Tailwind CSS
+Add an @import to your CSS file that imports Tailwind CSS
+
+src/index.css
+@import "tailwindcss";
+
+05.Add in the src/main.jsx
+import './index.css'
+
+import { StrictMode } from 'react'
+import { createRoot } from 'react-dom/client'
+import './index.css'
+
+// const styles = { fontWeight: 'bold', fontSize: 80, color: 'blue' }
+const styles = {
+    header: {
+        fontWeight: 'bold', fontSize: 80, color: 'blue'
+    },
+    container: {
+        backgroundColor: 'yellow'
+    }
+}
+
+const Header = () => {
+    return <div className="m-40" style={styles.container}>
+        <h1 style={{ fontWeight: 'bold', fontSize: 80, color: 'blue' }}>Hello</h1>
+        <h1 style={styles.header}>Hello</h1>
+
+    </div>
+}
+
+
+const App = () => {
+    return <>
+        <Header />
+    </>
+}
+createRoot(document.getElementById('root')).render(
+    <StrictMode>
+        <App />
+    </StrictMode>,
+)
+
+
+
