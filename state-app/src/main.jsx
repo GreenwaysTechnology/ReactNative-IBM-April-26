@@ -1,42 +1,68 @@
 import { createRoot } from 'react-dom/client'
+import { produce } from 'immer'
 import React from 'react'
 
 
-class Review extends React.Component {
+class Users extends React.Component {
     state = {
-        like: 0,
-        dislike: 0
+        users: [], //handle users data
+        isLoading: false, //handle spinners
+        error: null //handle any error while fetching
     }
-    onLike = () => {
-        this.setState(prevState => {
-            return { ...prevState, like: prevState.like + 1 }
-        })
+
+    async fetchUsers() {
+        try {
+            const url = `https://jsonplaceholder.typicode.com/users`
+            const response = await fetch(url)
+            if (!response.ok) throw new Error('Network response was not ok');
+            const users = await response.json()
+            console.log(users)
+            this.setState(produce(this.state, draft => {
+                draft.users = users
+                draft.isLoading = true
+            }))
+
+        }
+        catch (err) {
+            this.setState(produce(this.state, draft => {
+                draft.error = err
+                draft.isLoading = true
+            }))
+        }
     }
-    onDislike = () => {
-        this.setState(prevState => {
-            return { ...prevState, dislike: prevState.dislike + 1 }
-        })
+
+    //api logic
+    componentDidMount() {
+        this.fetchUsers()
     }
+
     render() {
-        // state as prop , listener as prop
-        return <ReviewDashBoard {...this.state} onLike={this.onLike} onDislike={this.onDislike} />
+        const { users, isLoading, error } = this.state
+        //conditional rendering
+        if (error) {
+            return <div>
+                <h1>{error.message}</h1>
+            </div>
+        } else if (!isLoading) {
+            return <h1>Loading....</h1>
+        } else {
+            return <ul>
+                {users.map(user => {
+                    return <li key={user.id}>
+                        <span>{user.name}</span>
+                    </li>
+                })}
+            </ul>
+        }
     }
-}
-const ReviewDashBoard = props => {
-    return <div>
-        <h1>Review App</h1>
-        <h2>Like : {props.like}  Dislike : {props.dislike}</h2>
-        <button onClick={props.onLike}>Like</button>
-        <button onClick={props.onDislike}>Dislike</button>
-    
-    </div>
 
 }
+
 
 function App() {
 
     return <>
-        <Review />
+        <Users />
     </>
 }
 
