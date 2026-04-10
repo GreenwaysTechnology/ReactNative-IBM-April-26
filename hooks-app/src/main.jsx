@@ -1,50 +1,62 @@
-import { produce } from 'immer'
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import { createRoot } from 'react-dom/client'
+import { produce } from 'immer'
 
-function Post() {
-    //inital post data
-    const [posts, setPosts] = useState([
-        { id: 1, title: 'Post 1', body: 'this is firstPost' },
-        { id: 2, title: 'Post 2', body: 'this is secondPost' }
-    ])
+function User() {
+    const initalState = {
+        items: [],
+        error: null,
+        isLoading: false
+    }
+    const [users, setUsers] = useState(initalState)
 
-    //track add or update 
-    const [isEditing, setIsEditing] = useState(false)
+    const fetchUsers = async () => {
+        try {
+            const url = 'https://jsonplaceholder.typicode.com/users'
+            const response = await fetch(url)
+            const tmpUsers = await response.json()
+            setUsers(produce(users, draft => {
+                draft.items = tmpUsers
+                draft.isLoading = true
+            }))
+        }
+        catch (err) {
+            setUsers(produce(users, draft => {
+                draft.error = err
+                draft.isLoading = true
+            }))
+        }
+    }
 
-    return <div>
-        {/* Forms */}
-        <form>
-            <div>
-                <input placeholder="title" />
-            </div>
-            <div>
-                <textarea placeholder="Body" />
-            </div>
-            <div>
-                <button>{isEditing ? "Update " : "Add " }Post</button>
-            </div>
-        </form>
+    //componentDidMount
+    useEffect(() => {
+        fetchUsers()
+    }, [])
 
-        {/* Render list */}
-        <ul>
-            {posts.map(post => {
-                return <li key={post.id}>
-                    <h2>{post.title}</h2>
-                    <p>{post.body}</p>
-                    <button>Edit</button>
-                    <button>Delete</button>
+    const { error, items, isLoading } = users
+    //show different ui: one for error, loading, data
+    if (error) {
+        return <h1>Something went Wrong!</h1>
+    } else if (!isLoading) {
+        return <h1>Loading...</h1>
+    } else {
+        return <ul>
+            {items.map(user => {
+                return <li key={user.id}>
+                    <span>{user.name} {user.email}</span>
                 </li>
             })}
         </ul>
-    </div>
+    }
 
 }
 
+
+
 function App() {
-    return <div style={{ margin: "60px" }}>
-        <Post />
-    </div>
+    return <>
+        <User />
+    </>
 }
 
 createRoot(document.getElementById('root')).render(
