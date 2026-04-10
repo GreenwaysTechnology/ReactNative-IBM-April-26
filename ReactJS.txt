@@ -3098,4 +3098,350 @@ function App() {
 createRoot(document.getElementById('root')).render(
     <App />
 )
+&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&
+
+Context:
+The React Context api is used to share data across the components without passing props manually at every level- prop drilling.
+
+Context API
+ it lets you create a global data store that any component can access
+
+common use cases:
+1.user authentication
+2.Themes (dark or light)
+3.language settings
+4.App wide configuration
+
+import React, { useState, useContext } from 'react'
+import { createRoot } from 'react-dom/client'
+
+//create Context Object
+export const UserContext = React.createContext()
+export const StatusContext = React.createContext()
+
+// function User(props) {
+//     //how to read data via there is hook useContext
+//     const context = useContext(UserContext)
+//     return <div>
+//         <h1>{context.user}</h1>
+//         <button onClick={()=>context.setUser("Geetha Subramanian")}>Change Name</button>
+//     </div>
+// }
+function User(props) {
+    //how to read data via there is hook useContext
+    const { user, setUser } = useContext(UserContext)
+    return <div>
+        <h1>User {user}</h1>
+        <button onClick={() => setUser("Geetha Subramanian")}>Change Name</button>
+    </div>
+}
+
+function Customer() {
+    const { user, setUser } = useContext(UserContext)
+    return <div>
+        <h1>Customer {user}</h1>
+        <button onClick={() => setUser("Geetha Subramanian")}>Change Name</button>
+    </div>
+}
+
+
+function App() {
+    const [user, setUser] = useState("Subramanian Murgan")
+    const [status, setStatus] = useState(false)
+    //provider is object(Component) used to provide/share data
+    return <UserContext.Provider value={{ user, setUser,status }} >
+        {/* child component */}
+        <User />
+        <Customer />
+    </UserContext.Provider>
+}
+
+createRoot(document.getElementById('root')).render(
+    <App />
+)
+.......................................................................................................................................................................................................................................
+											Component as a Prop
+&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&
+
+What can be a prop?
+
+1.data -
+  primitives,objects,arrays
+   static data or dynamic data (state as prop)
+2.function
+    listener as prop
+3.Component as a prop
+   component as a prop to another component
+
+
+import React, { useState, useContext } from 'react'
+import { createRoot } from 'react-dom/client'
+
+function Calls() {
+    return <h1>CallList</h1>
+}
+function Updates() {
+    return <h1>Updates</h1>
+}
+
+
+// function Tab(props) {
+//     return <div>
+//         {/* Render any tab content */}
+//         {props.children}
+//     </div>
+// }
+function Tab({ children }) {
+    return <div>
+        {/* Render any tab content */}
+        {children}
+    </div>
+}
+function Card({ children }) {
+    return <div style={{ border: "1px solid gray", padding: "20px" }}>
+        {children}
+    </div>
+}
+function Layout({ children }) {
+    return <div>
+        <header>Header</header>
+        <main>{children}</main>
+        <footer>Footer</footer>
+    </div>
+}
+
+function App() {
+
+    return <Layout>
+        <Tab>
+            {/* here you can pass any component */}
+            {/* <Calls/> */}
+            {/* <Updates /> */}
+            <Card>
+                <h2>Title</h2>
+                <p>Description</p>
+            </Card>
+        </Tab>
+    </Layout>
+}
+
+createRoot(document.getElementById('root')).render(
+    <App />
+)
+
+
+.....................................................................................
+				Redux -State Management lib
+.....................................................................................
+
+What is state?
+ State is nothing data.
+
+State is managed within component.
+
+What if i want to share the state across the application, there is pattern called "Lift up the state", pass as prop.
+
+In state management , redux is going to act as state layer, react is going act as UI layer.
+
+React and Redux is based on the design pattern "Flux Pattern"
+
+
+https://facebookarchive.github.io/flux/
+
+
+Action---->dispatcher----->Store<--->[Reducer] 
+			    |
+			    |
+			 View-React
+
+
+What is Redux -  Red-reducer + ux (Flux) => Reducer + Flux
+
+What is Reducer?
+  Reducer is pure function, which accepts input, returns immutable object...
+  Reducer is having biz logic.
+  Who calls reducer, reducer is called by store..
+  UI Layer never communicates biz logic (reducer) directly.
+  UI Layer sends request(action) --via dispatcher---to the store, then store reacts   to that
+
+Core Concepts or Principles:
+....................................................
+
+1.State:
+   Redux maintains or stores the data in "single object" Redux is going to store all 
+component state into one single object -Application State
+
+const appState = {
+  ....   
+} called as application state.
+
+How appState is identified for each component?
+
+Based on category/module.
+
+const appState = {
+  
+  order: {
+    
+  },
+  customer: {},
+  product:{}
+
+} 
+2.Store
+   Store is object where Redux application state lives.
+   Store offers api to communicate from react and redux to react
+   Store is entry and exit point of react and redux
+   Per application , there is single store, that store is having state..
+
+3.reducer
+    You know very well how to mutate and where mutate state in react
+     ->Inside setState pure function.
+    Reducer is pure function which returns immutable object.
+
+4.actions
+    An action is like request in webserver, redux actions are plain javascript object
+ eg:
+  let counterAction = {
+	type:'counter/increment'
+  }
+ action may take input also called payload
+  let counterByAmount = {
+   type:'counter/increment',
+   payload:2
+ }
+5.Dispatcher 
+  It is transporter which transport action object from react to redux
+  Dispatcher is represented by a method called "dispatch"
+  dispatch is part of "Store object"
+  store.dispatch(action)
+
+Why redux?
+  Redux is used in big applications where the app state is shared across multiple components
+  Redux is used in big application where team of developers works in a different modules.
+.....................................................................................
+
+Project Setup:
+npm create vite@latest myreact-redux
+
+dependencies
+
+npm install @reduxjs/toolkit react-redux
+
+Without Redux:
+import { useState } from "react"
+
+const Counter = () => {
+  const [count, setCount] = useState(0)
+
+  const onIncrement = () => {
+    setCount(count + 1)
+  }
+  return <div>
+    <h1>Count {count}</h1>
+    <button onClick={onIncrement}>+</button>
+  </div>
+}
+
+
+
+export default function App() {
+
+  return <>
+    <h1>React Redux Integration</h1>
+    <Counter/>
+  </>
+}
+
+Use case: simple counter reducer:
+
+in order to write reducer we have many syntax...
+
+old way -plain redux
+
+new way -redux toolkit
+
+
+Old-way:
+
+import { StrictMode } from 'react'
+import { createRoot } from 'react-dom/client'
+import './index.css'
+import { configureStore } from '@reduxjs/toolkit'
+import { Provider, useDispatch, useSelector } from 'react-redux'
+
+//redux : reducer (initalState,actionObject)
+const CounterReducer = (counter = 10, action) => {
+  //methods
+  switch (action.type) {
+    case 'counter/increment':
+      return counter + 1
+    default:
+      //default state
+      return counter;
+  }
+}
+
+//create store object
+const appStore = configureStore({
+  reducer: {
+    counter: CounterReducer
+  }
+})
+///////////////////////////////////////////////////////////////////////////////////////
+//React component layer
+const Counter = (props) => {
+  const counter = useSelector(state => {
+    //appState.reducerName
+    return state.counter
+  })
+
+  const dispatch = useDispatch()
+
+  const onIncrement = () => {
+    //action object
+    const incrementAction = {
+      type: 'counter/increment'
+    }
+    //dispatch an action to reducer
+    dispatch(incrementAction)
+  }
+  return <div>
+    <h1>React Redux</h1>
+    <h2>Counter {counter}</h2>
+    <button onClick={onIncrement}>+</button>
+  </div>
+}
+
+
+
+///
+//connecting react with redux: That should be top level component.
+
+//react-redux lib provides a context object through which we can pass store object into
+//react components
+const App = () => {
+  return <Provider store={appStore}>
+    {/* Your components */}
+    <Counter />
+  </Provider>
+}
+
+createRoot(document.getElementById('root')).render(
+  <StrictMode>
+    <App />
+  </StrictMode>,
+)
+
+
+
+
+
+
+
+
+
+
+
+
 
