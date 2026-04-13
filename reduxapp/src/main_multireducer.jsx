@@ -3,16 +3,11 @@ import { createRoot } from 'react-dom/client'
 import { Provider, useDispatch, useSelector } from 'react-redux'
 import { produce } from 'immer'
 
-//action constant
-const counterIncrement = "counter/increment"
-const counterDecrement = "counter/decrement"
-const counterIncrementBy = "counter/incrementBy"
-
 //redux - Biz logic and state
 const CounterIncrementReducer = (count = { value: 10 }, action) => {
     //logic
     switch (action.type) {
-        case counterIncrement:
+        case "counter/increment":
             //immutable logic
             return produce(count, (draft) => {
                 draft.value += 1
@@ -26,7 +21,7 @@ const CounterIncrementReducer = (count = { value: 10 }, action) => {
 const CounterDecrementReducer = (count = { value: 10 }, action) => {
     //logic
     switch (action.type) {
-        case counterDecrement:
+        case "counter/decrement":
             return produce(count, (draft) => {
                 draft.value -= 1
             })
@@ -38,7 +33,7 @@ const CounterDecrementReducer = (count = { value: 10 }, action) => {
 const CounterIncrementByReducer = (count = { value: 10 }, action) => {
     //logic
     switch (action.type) {
-        case counterIncrementBy:
+        case "counter/incrementBy":
             return produce(count, (draft) => {
                 draft.value += action.payload
             })
@@ -71,27 +66,18 @@ const Counter = () => {
     })
     const dispatch = useDispatch() //dispatcher
 
-    //action creator : function which returns action object
-    const incrementBy = payload => {
-        //returns action object
-        return {
-            type: counterIncrementBy,
-            payload
-        }
-    }
-
     const onIncrement = () => {
         //send request to redux reducer via action object
-        dispatch({ type: counterIncrement })
+        dispatch({ type: 'counter/increment' })
     }
     return <div>
         <h1>Increment: {incrementState.value} Decrement:{decrementState.value} IncrementBy:{incrementByState.value}</h1>
         <button onClick={onIncrement}>+</button>
         <button onClick={() => {
-            dispatch({ type: counterDecrement })
+            dispatch({ type: 'counter/decrement' })
         }}>-</button>
         <button onClick={() => {
-            dispatch(incrementBy(3))
+            dispatch({ type: 'counter/incrementBy', payload: 2 })
         }}>IncrementBy</button>
     </div>
 }

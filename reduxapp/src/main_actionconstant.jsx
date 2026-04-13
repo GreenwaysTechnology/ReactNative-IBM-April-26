@@ -71,15 +71,6 @@ const Counter = () => {
     })
     const dispatch = useDispatch() //dispatcher
 
-    //action creator : function which returns action object
-    const incrementBy = payload => {
-        //returns action object
-        return {
-            type: counterIncrementBy,
-            payload
-        }
-    }
-
     const onIncrement = () => {
         //send request to redux reducer via action object
         dispatch({ type: counterIncrement })
@@ -91,7 +82,7 @@ const Counter = () => {
             dispatch({ type: counterDecrement })
         }}>-</button>
         <button onClick={() => {
-            dispatch(incrementBy(3))
+            dispatch({ type: counterIncrementBy, payload: 2 })
         }}>IncrementBy</button>
     </div>
 }
