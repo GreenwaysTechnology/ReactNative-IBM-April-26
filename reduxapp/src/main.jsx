@@ -1,110 +1,204 @@
-import { configureStore } from '@reduxjs/toolkit'
+import { createAsyncThunk, createSlice } from '@reduxjs/toolkit';
+import { configureStore } from '@reduxjs/toolkit';
+import { useState ,useEffect } from 'react'
+import { useSelector, useDispatch, Provider } from 'react-redux';
 import { createRoot } from 'react-dom/client'
-import { Provider, useDispatch, useSelector } from 'react-redux'
-import { produce } from 'immer'
+import { createLogger } from 'redux-logger'
 
-//action constant
-const counterIncrement = "counter/increment"
-const counterDecrement = "counter/decrement"
-const counterIncrementBy = "counter/incrementBy"
+const logger = createLogger()
 
-//redux - Biz logic and state
-const CounterIncrementReducer = (count = { value: 10 }, action) => {
-    //logic
-    switch (action.type) {
-        case counterIncrement:
-            //immutable logic
-            return produce(count, (draft) => {
-                draft.value += 1
+//api logic: middleware logic for data fetching
+//users/fetchUsers/pending or users/fetchUsers/completed,users/fetchUsers/failed
+export const fetchUsers = createAsyncThunk('users/fetchUsers', async () => {
+    const response = await fetch("https://jsonplaceholder.typicode.com/users")
+    return response.json()
+})
+// Add a new user
+export const addUser = createAsyncThunk('users/addUser', async (newUser) => {
+    const response = await fetch('https://jsonplaceholder.typicode.com/users', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(newUser),
+    });
+    return response.json();
+});
+// Update an existing user
+export const updateUser = createAsyncThunk('users/updateUser', async ({ id, updatedUser }) => {
+    const response = await fetch(`https://jsonplaceholder.typicode.com/users/${id}`, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(updatedUser),
+    });
+    return response.json();
+});
+// Delete a user
+export const deleteUser = createAsyncThunk('users/deleteUser', async (id) => {
+    await fetch(`https://jsonplaceholder.typicode.com/users/${id}`, {
+        method: 'DELETE',
+    });
+    return id;
+});
+//slice
+const usersSlice = createSlice({
+    name: 'users',
+    initialState: {
+        list: [],
+        status: 'idle',  // idle|loading|succeed|failed
+        error: null
+    },
+    reducers: {},
+    extraReducers: builder => {
+        builder.addCase(fetchUsers.pending, (state) => {
+            state.status = 'loading'
+        }).addCase(fetchUsers.fulfilled, (state, action) => {
+            state.status = 'succeeded';
+            state.list = action.payload;
+        }).addCase(fetchUsers.rejected, (state, action) => {
+            state.status = 'failed';
+            state.error = action.error.message;
+        })
+            // Add User
+            .addCase(addUser.pending, (state) => {
+                state.status = 'loading';
             })
-        default:
-            //default state or inital state
-            return count
-    }
-}
+            .addCase(addUser.fulfilled, (state, action) => {
+                state.status = 'succeeded';
+                state.list.push(action.payload);
+            })
+            .addCase(addUser.rejected, (state, action) => {
+                state.status = 'failed';
+                state.error = action.error.message;
+            })
 
-const CounterDecrementReducer = (count = { value: 10 }, action) => {
-    //logic
-    switch (action.type) {
-        case counterDecrement:
-            return produce(count, (draft) => {
-                draft.value -= 1
+            // Update User
+            .addCase(updateUser.pending, (state) => {
+                state.status = 'loading';
             })
-        default:
-            //default state or inital state
-            return count
-    }
-}
-const CounterIncrementByReducer = (count = { value: 10 }, action) => {
-    //logic
-    switch (action.type) {
-        case counterIncrementBy:
-            return produce(count, (draft) => {
-                draft.value += action.payload
+            .addCase(updateUser.fulfilled, (state, action) => {
+                state.status = 'succeeded';
+                const index = state.list.findIndex((user) => user.id === action.payload.id);
+                state.list[index] = action.payload;
             })
-        default:
-            //default state or inital state
-            return count
-    }
-}
-//create store object
-const store = configureStore({
-    reducer: {
-        increment: CounterIncrementReducer,
-        decrement: CounterDecrementReducer,
-        incrementBy: CounterIncrementByReducer
+            .addCase(updateUser.rejected, (state, action) => {
+                state.status = 'failed';
+                state.error = action.error.message;
+            })
+
+            // Delete User
+            .addCase(deleteUser.pending, (state) => {
+                state.status = 'loading';
+            })
+            .addCase(deleteUser.fulfilled, (state, action) => {
+                state.status = 'succeeded';
+                state.list = state.list.filter((user) => user.id !== action.payload);
+            })
+            .addCase(deleteUser.rejected, (state, action) => {
+                state.status = 'failed';
+                state.error = action.error.message;
+            });
+
     }
 })
-
-//react - UI
-const Counter = () => {
-    const incrementState = useSelector(appState => {
-        return appState.increment
-    })
-
-    const decrementState = useSelector(appState => {
-        return appState.decrement
-    })
-
-    const incrementByState = useSelector(appState => {
-        return appState.incrementBy
-    })
-    const dispatch = useDispatch() //dispatcher
-
-    //action creator : function which returns action object
-    const incrementBy = payload => {
-        //returns action object
-        return {
-            type: counterIncrementBy,
-            payload
-        }
-    }
-
-    const onIncrement = () => {
-        //send request to redux reducer via action object
-        dispatch({ type: counterIncrement })
-    }
-    return <div>
-        <h1>Increment: {incrementState.value} Decrement:{decrementState.value} IncrementBy:{incrementByState.value}</h1>
-        <button onClick={onIncrement}>+</button>
-        <button onClick={() => {
-            dispatch({ type: counterDecrement })
-        }}>-</button>
-        <button onClick={() => {
-            dispatch(incrementBy(3))
-        }}>IncrementBy</button>
-    </div>
+const UserReducer = usersSlice.reducer
+export const store = configureStore({
+    reducer: {
+        users: UserReducer,
+    },
+    middleware: (getDefaultMiddleware) => getDefaultMiddleware().concat(logger)
+});
+function UserItem({ user, onEdit, onDelete }) {
+    return (
+        <li>
+            <span>{user.name} ({user.email})</span>
+            <button onClick={() => onEdit(user)}>Edit</button>
+            <button onClick={() => onDelete(user.id)}>Delete</button>
+        </li>
+    );
 }
+function Users() {
+    const [name, setName] = useState('');
+    const [email, setEmail] = useState('');
+    const [editingUser, setEditingUser] = useState(null);
 
+    const { list: users, status, error } = useSelector((state) => state.users);
+    const dispatch = useDispatch();
 
+    useEffect(() => {
+        dispatch(fetchUsers());
+    }, [dispatch]);
+
+    const handleAddOrUpdateUser = () => {
+        if (editingUser) {
+            dispatch(updateUser({ id: editingUser.id, updatedUser: { name, email } }));
+            setEditingUser(null);
+        } else {
+            dispatch(addUser({ name, email }));
+        }
+        setName('');
+        setEmail('');
+    };
+
+    const handleEdit = (user) => {
+        setEditingUser(user);
+        setName(user.name);
+        setEmail(user.email);
+    };
+
+    const handleDelete = (id) => {
+        dispatch(deleteUser(id));
+    };
+
+    return (
+        <div>
+            <h1>User Management</h1>
+
+            {/* Loading or Error Messages */}
+            {status === 'loading' && <p>Loading...</p>}
+            {status === 'failed' && <p style={{ color: 'red' }}>Error: {error}</p>}
+
+            {/* User Input */}
+            <div>
+                <input
+                    type="text"
+                    placeholder="Name"
+                    value={name}
+                    onChange={(e) => setName(e.target.value)}
+                />
+                <input
+                    type="email"
+                    placeholder="Email"
+                    value={email}
+                    onChange={(e) => setEmail(e.target.value)}
+                />
+                <button onClick={handleAddOrUpdateUser}>
+                    {editingUser ? 'Update User' : 'Add User'}
+                </button>
+            </div>
+
+            {/* User List */}
+            {status === 'succeeded' && (
+                <ul>
+                    {users.map((user) => (
+                        <UserItem
+                            key={user.id}
+                            user={user}
+                            onEdit={handleEdit}
+                            onDelete={handleDelete}
+                        />
+                    ))}
+                </ul>
+            )}
+        </div>
+    );
+}
 function App() {
 
     return <Provider store={store}>
-        {/* Render Counter Component */}
-        <Counter />
+        <Users />
     </Provider>
 }
 
 createRoot(document.getElementById('root')).render(
     <App />
 )
+
