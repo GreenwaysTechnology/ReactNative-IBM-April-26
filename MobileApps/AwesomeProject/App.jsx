@@ -1,42 +1,63 @@
-import { StatusBar, View, Text, StyleSheet } from "react-native";
-import { SafeAreaProvider, SafeAreaView, useSafeAreaInsets } from "react-native-safe-area-context";
+import { useState } from "react";
+import { StatusBar, Text, View, Image, StyleSheet, TouchableOpacity, Button } from "react-native"
+import { SafeAreaProvider, useSafeAreaInsets } from "react-native-safe-area-context"
 
-function Hello() {
+function CounterScreen() {
     const insets = useSafeAreaInsets();
+    const [counter, setCounter] = useState(0)
+
     return <View style={[{
         paddingTop: insets.top,
         paddingBottom: insets.bottom,
         paddingLeft: insets.left,
         paddingRight: insets.right
     }, styles.container]}>
-        <Text style={styles.text}>Hello React Native!</Text>
+        {/* lable to display counter */}
+        <Text style={{
+            textAlign: 'center',
+            fontWeight: 'bold',
+            color: 'red',
+            fontSize: 50
+        }} >{counter}</Text>
+        <Button title="Increment" onPress={() => {
+            setCounter(counter + 1)
+        }} />
+        <TouchableOpacity style={[styles.button]} onPress={() => {
+            setCounter(counter + 1)
+
+        }}>
+            <Text style={styles.buttonText}>Increment</Text>
+        </TouchableOpacity>
     </View>
 }
 
 function App() {
     return <SafeAreaProvider>
         <StatusBar barStyle="dark-content" />
-        <Hello />
+        <CounterScreen />
     </SafeAreaProvider>
 }
+
 export default App
 
-//styles for components
+//define Style
 const styles = StyleSheet.create({
     container: {
-        flex:1,
-        backgroundColor: "rgb(209, 146, 29)"
+        flex: 1,
+        backgroundColor: '#f2f2f2',
     },
-    text: {
-        marginTop: 16,
-        paddingVertical: 8,
-        borderWidth: 4,
-        borderColor: '#20232a',
-        borderRadius: 6,
-        backgroundColor: 'rgb(215, 229, 233)',
-        color: '#20232a',
-        textAlign: 'center',
-        fontSize: 30,
-        fontWeight: 'bold'
-    }
-})
+    button: {
+        backgroundColor: '#007bff',
+        padding: 15,
+        borderRadius: 8,
+        marginBottom: 10,
+        marginTop: 10,
+        alignItems: 'center',
+    },
+
+    buttonText: {
+        color: 'white',
+        fontWeight: 'bold',
+    },
+});
+
